@@ -1,0 +1,269 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 44;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		6AFC73111667F87C00601CA7 /* PM3Monitor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6AFC730E1667F87C00601CA7 /* PM3Monitor.cpp */; };
+		6AFC73121667F87C00601CA7 /* utility.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6AFC730F1667F87C00601CA7 /* utility.cpp */; };
+		6AFC731E166930B300601CA7 /* libPM3DDICP.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6AFC731A166930B300601CA7 /* libPM3DDICP.a */; };
+		6AFC731F166930B300601CA7 /* libPM3CSafeCP.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6AFC731B166930B300601CA7 /* libPM3CSafeCP.a */; };
+		6AFC7320166930B300601CA7 /* libLCPM3USB.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6AFC731C166930B300601CA7 /* libLCPM3USB.a */; };
+		6AFC7322166930C400601CA7 /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6AFC7321166930C400601CA7 /* Carbon.framework */; };
+		6AFC7327166930D600601CA7 /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6AFC7326166930D600601CA7 /* IOKit.framework */; };
+		8DD76F650486A84900D96B5E /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08FB7796FE84155DC02AAC07 /* main.cpp */; settings = {ATTRIBUTES = (); }; };
+		8DD76F6A0486A84900D96B5E /* PM3Monitor.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = C6859E8B029090EE04C91782 /* PM3Monitor.1 */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		8DD76F690486A84900D96B5E /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 8;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+				8DD76F6A0486A84900D96B5E /* PM3Monitor.1 in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		08FB7796FE84155DC02AAC07 /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		6AFC730D1667F87C00601CA7 /* PM3Monitor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PM3Monitor.h; sourceTree = "<group>"; };
+		6AFC730E1667F87C00601CA7 /* PM3Monitor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PM3Monitor.cpp; sourceTree = "<group>"; };
+		6AFC730F1667F87C00601CA7 /* utility.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = utility.cpp; sourceTree = "<group>"; };
+		6AFC73101667F87C00601CA7 /* utility.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = utility.h; sourceTree = "<group>"; };
+		6AFC7317166930B300601CA7 /* PM3DDICP.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PM3DDICP.h; path = concept2/PM3DDICP.h; sourceTree = "<group>"; };
+		6AFC7318166930B300601CA7 /* PM3USBCP.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PM3USBCP.h; path = concept2/PM3USBCP.h; sourceTree = "<group>"; };
+		6AFC7319166930B300601CA7 /* PM3CsafeCP.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PM3CsafeCP.h; path = concept2/PM3CsafeCP.h; sourceTree = "<group>"; };
+		6AFC731A166930B300601CA7 /* libPM3DDICP.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libPM3DDICP.a; path = concept2/libPM3DDICP.a; sourceTree = "<group>"; };
+		6AFC731B166930B300601CA7 /* libPM3CSafeCP.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libPM3CSafeCP.a; path = concept2/libPM3CSafeCP.a; sourceTree = "<group>"; };
+		6AFC731C166930B300601CA7 /* libLCPM3USB.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLCPM3USB.a; path = concept2/libLCPM3USB.a; sourceTree = "<group>"; };
+		6AFC731D166930B300601CA7 /* csafe.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = csafe.h; path = concept2/csafe.h; sourceTree = "<group>"; };
+		6AFC7321166930C400601CA7 /* Carbon.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Carbon.framework; path = System/Library/Frameworks/Carbon.framework; sourceTree = SDKROOT; };
+		6AFC7326166930D600601CA7 /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = System/Library/Frameworks/IOKit.framework; sourceTree = SDKROOT; };
+		8DD76F6C0486A84900D96B5E /* PM3Monitor */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = PM3Monitor; sourceTree = BUILT_PRODUCTS_DIR; };
+		C6859E8B029090EE04C91782 /* PM3Monitor.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = PM3Monitor.1; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		8DD76F660486A84900D96B5E /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6AFC731E166930B300601CA7 /* libPM3DDICP.a in Frameworks */,
+				6AFC731F166930B300601CA7 /* libPM3CSafeCP.a in Frameworks */,
+				6AFC7320166930B300601CA7 /* libLCPM3USB.a in Frameworks */,
+				6AFC7322166930C400601CA7 /* Carbon.framework in Frameworks */,
+				6AFC7327166930D600601CA7 /* IOKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		08FB7794FE84155DC02AAC07 /* PM3Monitor */ = {
+			isa = PBXGroup;
+			children = (
+				6AFC73161669307E00601CA7 /* Frameworks */,
+				6AFC73131667F88300601CA7 /* Concept2 */,
+				08FB7795FE84155DC02AAC07 /* Source */,
+				C6859E8C029090F304C91782 /* Documentation */,
+				1AB674ADFE9D54B511CA2CBB /* Products */,
+			);
+			name = PM3Monitor;
+			sourceTree = "<group>";
+		};
+		08FB7795FE84155DC02AAC07 /* Source */ = {
+			isa = PBXGroup;
+			children = (
+				6AFC730D1667F87C00601CA7 /* PM3Monitor.h */,
+				6AFC730E1667F87C00601CA7 /* PM3Monitor.cpp */,
+				6AFC730F1667F87C00601CA7 /* utility.cpp */,
+				6AFC73101667F87C00601CA7 /* utility.h */,
+				08FB7796FE84155DC02AAC07 /* main.cpp */,
+			);
+			name = Source;
+			sourceTree = "<group>";
+		};
+		1AB674ADFE9D54B511CA2CBB /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				8DD76F6C0486A84900D96B5E /* PM3Monitor */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		6AFC73131667F88300601CA7 /* Concept2 */ = {
+			isa = PBXGroup;
+			children = (
+				6AFC7317166930B300601CA7 /* PM3DDICP.h */,
+				6AFC7318166930B300601CA7 /* PM3USBCP.h */,
+				6AFC7319166930B300601CA7 /* PM3CsafeCP.h */,
+				6AFC731A166930B300601CA7 /* libPM3DDICP.a */,
+				6AFC731B166930B300601CA7 /* libPM3CSafeCP.a */,
+				6AFC731C166930B300601CA7 /* libLCPM3USB.a */,
+				6AFC731D166930B300601CA7 /* csafe.h */,
+			);
+			name = Concept2;
+			sourceTree = "<group>";
+		};
+		6AFC73161669307E00601CA7 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				6AFC7321166930C400601CA7 /* Carbon.framework */,
+				6AFC7326166930D600601CA7 /* IOKit.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		C6859E8C029090F304C91782 /* Documentation */ = {
+			isa = PBXGroup;
+			children = (
+				C6859E8B029090EE04C91782 /* PM3Monitor.1 */,
+			);
+			name = Documentation;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		8DD76F620486A84900D96B5E /* PM3Monitor */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 1DEB923108733DC60010E9CD /* Build configuration list for PBXNativeTarget "PM3Monitor" */;
+			buildPhases = (
+				8DD76F640486A84900D96B5E /* Sources */,
+				8DD76F660486A84900D96B5E /* Frameworks */,
+				8DD76F690486A84900D96B5E /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = PM3Monitor;
+			productInstallPath = "$(HOME)/bin";
+			productName = PM3Monitor;
+			productReference = 8DD76F6C0486A84900D96B5E /* PM3Monitor */;
+			productType = "com.apple.product-type.tool";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		08FB7793FE84155DC02AAC07 /* Project object */ = {
+			isa = PBXProject;
+			buildConfigurationList = 1DEB923508733DC60010E9CD /* Build configuration list for PBXProject "PM3Monitor" */;
+			compatibilityVersion = "Xcode 3.0";
+			hasScannedForEncodings = 1;
+			mainGroup = 08FB7794FE84155DC02AAC07 /* PM3Monitor */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				8DD76F620486A84900D96B5E /* PM3Monitor */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		8DD76F640486A84900D96B5E /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8DD76F650486A84900D96B5E /* main.cpp in Sources */,
+				6AFC73111667F87C00601CA7 /* PM3Monitor.cpp in Sources */,
+				6AFC73121667F87C00601CA7 /* utility.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		1DEB923208733DC60010E9CD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"_GLIBCXX_DEBUG=1",
+					"_GLIBCXX_DEBUG_PEDANTIC=1",
+				);
+				INSTALL_PATH = /usr/local/bin;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/concept2\"",
+				);
+				PRODUCT_NAME = PM3Monitor;
+				ZERO_LINK = YES;
+			};
+			name = Debug;
+		};
+		1DEB923308733DC60010E9CD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_MODEL_TUNING = G5;
+				INSTALL_PATH = /usr/local/bin;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/concept2\"",
+				);
+				PRODUCT_NAME = PM3Monitor;
+			};
+			name = Release;
+		};
+		1DEB923608733DC60010E9CD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GCC_DEBUGGING_SYMBOLS = default;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				PREBINDING = NO;
+				SDKROOT = "$(DEVELOPER_SDK_DIR)/MacOSX10.5.sdk";
+			};
+			name = Debug;
+		};
+		1DEB923708733DC60010E9CD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = (
+					ppc,
+					i386,
+				);
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				PREBINDING = NO;
+				SDKROOT = "$(DEVELOPER_SDK_DIR)/MacOSX10.5.sdk";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		1DEB923108733DC60010E9CD /* Build configuration list for PBXNativeTarget "PM3Monitor" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1DEB923208733DC60010E9CD /* Debug */,
+				1DEB923308733DC60010E9CD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		1DEB923508733DC60010E9CD /* Build configuration list for PBXProject "PM3Monitor" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1DEB923608733DC60010E9CD /* Debug */,
+				1DEB923708733DC60010E9CD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 08FB7793FE84155DC02AAC07 /* Project object */;
+}
