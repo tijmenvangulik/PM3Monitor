@@ -7,4 +7,9 @@
  *
  */
 
+#ifndef UTILITY_HEADER
+#define UTILITY_HEADER
+
 int keyboardHit();
+
+#endif

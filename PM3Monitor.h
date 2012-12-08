@@ -25,6 +25,9 @@
  limitations under the License.
  */ 
 
+#ifndef PM3MONITOR_HEADER
+#define PM3MONITOR_HEADER
+
 #include <exception>
 #include <Carbon/Carbon.h>
 #include <string>
@@ -34,19 +37,20 @@ using namespace std;
 
 
 enum StrokePhase
-    {
-        StrokePhase_Idle = 0,
-        StrokePhase_Catch = 1,
-        StrokePhase_Drive = 2,
-        StrokePhase_Dwell = 3,
-        StrokePhase_Recovery = 4
-    };
-    
+{
+	StrokePhase_Idle = 0,
+	StrokePhase_Catch = 1,
+	StrokePhase_Drive = 2,
+	StrokePhase_Dwell = 3,
+	StrokePhase_Recovery = 4
+};
+
 //convert the phase to a display text
 const char* strokePhaseToString(StrokePhase strokePhase);
 
 class PM3Exception:public exception
-{ public:
+{ 
+  public:
     PM3Exception(int a_errorCode,const string a_errorText);
     PM3Exception(const PM3Exception &e);
     ~PM3Exception() throw();
@@ -81,8 +85,26 @@ struct StrokeData
 	uint strokesPerMinute;		 
 };
 
+class PM3Monitor;
+
+//public Events, override the handler functions to get the data
+class PM3MonitorHandler
+{ 
+public:
+	// attach to this event for live drawing of the curve. (onStrokeDataUpdate gives only the curve at the end of the stroke 
+	virtual void onIncrementalPowerCurveUpdate(PM3Monitor &monitor,unsigned short int a_value,unsigned short int a_index)
+	{};
+	//called on catch,drive,dwell and recovery ( the catch is not  allways send )
+	virtual void onNewStrokePhase(PM3Monitor &monitor,StrokePhase strokePhase)
+	{};
+	//strokeData contains info about the stroke. Send at the same time as the dwell
+	virtual void onStrokeDataUpdate(PM3Monitor &monitor,StrokeData &strokeData)
+	{};
+};
+
 class PM3Monitor
-{ protected:
+{ 
+protected:
 	
     bool _initialized;
     unsigned short int _deviceCount;
@@ -97,7 +119,7 @@ class PM3Monitor
 	UInt32 _rsp_data[CM_DATA_BUFFER_SIZE];
 	unsigned short int _rsp_data_size;
 	
-	void *_eventData;
+	PM3MonitorHandler* _handler;
 	
 	uint _nSPMReads;
 	uint _nSPM;
@@ -115,12 +137,12 @@ class PM3Monitor
 	virtual void incrementalPowerCurveUpdate();
 	virtual void strokeDataUpdate();
 	
-  public:
+public:
 	//this mst be called after the create
 	unsigned short int initialize();
 	
 	//call start to connect to the device numer and set the event data which is returned for each event
-	void start(unsigned short int a_deviceNumber,void *eventData);
+	void start(unsigned short int a_deviceNumber,PM3MonitorHandler& handler);
 	
 	//resets the PM3, already called in the initialize at the first time
 	void reset();
@@ -133,18 +155,11 @@ class PM3Monitor
 	
 	//return current device number a_deviceNumber 
 	unsigned short int deviceNumber();
-
+	
 	PM3Monitor();
 	
-  //events
-  public:
-    // attach to this event for live drawing of the curve. (onStrokeDataUpdate gives only the curve at the end of the stroke 
-	void (*onIncrementalPowerCurveUpdate)(void *eventData,unsigned short int a_value,unsigned short int a_index);
-	//called on catch,drive,dwell and recovery ( the catch is not  allways send )
-	void (*onNewStrokePhase)(void *eventData,StrokePhase strokePhase);
-	//strokeData contains info about the stroke. Send at the same time as the dwell
-	void (*onStrokeDataUpdate)(void *eventData,StrokeData &strokeData);
-
+	
 	
 };
 
+#endif //PM3MONITOR_HEADER

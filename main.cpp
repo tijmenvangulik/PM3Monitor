@@ -32,63 +32,76 @@
 
 using namespace std;
 
-void strokeDataUpdate(void *eventData,StrokeData &strokeData)
-{   cout << "----------------------------------------------------\n";
-	cout << "curve :"<< strokeData.forcePlotCount<<" \n";
-	for(int i=0;i<strokeData.forcePlotCount;i++)
-	{   cout << strokeData.forcePlotPoints[i];
-		for(int i2=0;i2<strokeData.forcePlotPoints[i];i2+=5) 
-        { cout << "*";
-        }
-	    cout << "\n";
-  }
-	cout << "Drag factor: " << strokeData.dragFactor << "\n";
-	cout << "Work distance: " <<  strokeData.workDistance << "\n";
-	cout << "Work time " <<  strokeData.workTimehours << ":" 
-	     << strokeData.workTimeminutes<< ":" 
-	     << strokeData.workTimeseconds << "\n"; 
-	cout << "Work time: " <<  strokeData.workTime << "\n";
-	cout << "Split: " <<  strokeData.splitMinutes << ":" 
-	     << strokeData.splitSeconds << "\n";
-	cout << "Power: " <<  strokeData.power << "\n";
-	cout << "Strokes Per Minute Average: " <<  strokeData.strokesPerMinuteAverage << "\n";
-	cout << "Strokes Per Minute: " <<  strokeData.strokesPerMinute << "\n";
-	cout << "\n";
+class HandlePM3Data : public PM3MonitorHandler {
+public:
+	// attach to this event for live drawing of the curve. (onStrokeDataUpdate gives only the curve at the end of the stroke 
+	void onIncrementalPowerCurveUpdate(PM3Monitor &monitor,unsigned short int a_value,unsigned short int a_index)
+	{ 
+		//no code yet
+	}
+	//called on catch,drive,dwell and recovery ( the catch is not  allways send )
+	void onNewStrokePhase(PM3Monitor &monitor,StrokePhase strokePhase)
+	{   
+		std::cout << " new stroke phase: " <<  strokePhaseToString(strokePhase) << "\n";  	
+	}
 	
-}
+	//strokeData contains info about the stroke. Send at the same time as the dwell
+	void onStrokeDataUpdate(PM3Monitor &monitor,StrokeData &strokeData)
+	{   
+		cout << "----------------------------------------------------\n";
+		cout << "curve :"<< strokeData.forcePlotCount<<" \n";
+		for(int i=0;i<strokeData.forcePlotCount;i++)
+		{   cout << strokeData.forcePlotPoints[i];
+			for(int i2=0;i2<strokeData.forcePlotPoints[i];i2+=5) 
+			{ cout << "*";
+			}
+			cout << "\n";
+		}
+		cout << "Drag factor: " << strokeData.dragFactor << "\n";
+		cout << "Work distance: " <<  strokeData.workDistance << "\n";
+		cout << "Work time " <<  strokeData.workTimehours << ":" 
+		<< strokeData.workTimeminutes<< ":" 
+		<< strokeData.workTimeseconds << "\n"; 
+		cout << "Work time: " <<  strokeData.workTime << "\n";
+		cout << "Split: " <<  strokeData.splitMinutes << ":" 
+		<< strokeData.splitSeconds << "\n";
+		cout << "Power: " <<  strokeData.power << "\n";
+		cout << "Strokes Per Minute Average: " <<  strokeData.strokesPerMinuteAverage << "\n";
+		cout << "Strokes Per Minute: " <<  strokeData.strokesPerMinute << "\n";
+		cout << "\n";
+		
+	}	
+};
 
-
-void newStrokePhase(void *eventDate,StrokePhase strokePhase)
-{   std::cout << " new stroke phase: " <<  strokePhaseToString(strokePhase) << "\n";  	
-}
 
 
 int main (int argc, char * const argv[]) {
-
+	
 	std::cout << "Start PM3 Monitor ( press enter to stop)\n";
-
+	
 	PM3Monitor monitor = PM3Monitor();	
 	
-    //connect to the events
-	monitor.onStrokeDataUpdate = strokeDataUpdate;
-	monitor.onNewStrokePhase = newStrokePhase;
+	//object for the events which prints the perforance data
+	HandlePM3Data handler; 
 	
 	try
-	{   //initializes the monitor
- 		
+	{   
+		//initializes the monitor, returns the nr of devices, but ignore
         monitor.initialize();  
  		
 		//you write here code to ask the user to  which device he wants to connect
 		
-	    monitor.start(0,//device 0 assume there is only one
-					  NULL ); // pointer passed on with events 
+	    monitor.start(0,//device 0 assume there is only one, then it is allways one
+					  handler ); // handler which handles the events 
 		
 		//keep on monitoring till you hit a key
-		while(!keyboardHit()) //not pressed key board
-		{ //update the performance info
-		  monitor.update();
-		  //give other processes some time and do use 100% cpu
-		  usleep(80);
+		while( !keyboardHit() ) //not pressed key board
+		{ 
+			//update the performance info
+			monitor.update();
+			
+			//give other processes some time and do use 100% cpu
+			usleep(80);
 		}
 		std::cout << "Stop PM3 Monitor\n";
 	}
@@ -96,6 +109,6 @@ int main (int argc, char * const argv[]) {
     {  
 		cerr << e.errorText;
 		return e.errorCode;
-   } 	
-  return 0;
+	} 	
+	return 0;
 }
