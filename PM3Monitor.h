@@ -31,6 +31,7 @@
 #include <exception>
 #include <Carbon/Carbon.h>
 #include <string>
+#include "PM3DDICP.h"
 
 using namespace std;
 
@@ -107,17 +108,17 @@ class PM3Monitor
 protected:
 	
     bool _initialized;
-    unsigned short int _deviceCount;
-	unsigned short int _deviceNumber;
+    UINT16_T _deviceCount;
+	UINT16_T _deviceNumber;
 	StrokeData _strokeData;
 	
 	StrokePhase _previousStrokePhase;
 	StrokePhase _currentStrokePhase;
 	
-	UInt32 _cmd_data[CM_DATA_BUFFER_SIZE];
-	unsigned short int _cmd_data_size;
-	UInt32 _rsp_data[CM_DATA_BUFFER_SIZE];
-	unsigned short int _rsp_data_size;
+	UINT32_T _cmd_data[CM_DATA_BUFFER_SIZE];
+	UINT16_T _cmd_data_size;
+	UINT32_T _rsp_data[CM_DATA_BUFFER_SIZE];
+	UINT16_T _rsp_data_size;
 	
 	PM3MonitorHandler* _handler;
 	

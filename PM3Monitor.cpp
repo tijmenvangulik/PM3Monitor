@@ -8,7 +8,6 @@
  */
 
 #include "PM3Monitor.h"
-#include "PM3DDICP.h"
 #include "PM3CSafeCP.h"
 #include "PM3USBCP.h"
 #include "csafe.h"
