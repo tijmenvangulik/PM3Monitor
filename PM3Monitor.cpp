@@ -77,10 +77,6 @@ void handleError(int errorCode, const string errorText)
 	}
 }
 
-PM3Monitor::PM3Monitor()
-{ 
-}
-
 unsigned short int PM3Monitor::deviceNumber()
 { 
 	return _deviceNumber;
@@ -107,8 +103,6 @@ void PM3Monitor::executeCSafeCommand(const char* description )
 
 unsigned short int PM3Monitor::initialize()
 {  
-	if (!_initialized)
-    { 
 		
 		handleError(
 					tkcmdsetDDI_init(),
@@ -122,16 +116,23 @@ unsigned short int PM3Monitor::initialize()
 					tkcmdsetDDI_discover_pm3s((char *)TKCMDSET_PM3_PRODUCT_NAME2, 0, &_deviceCount),
 					"tkcmdsetDDI_discover_pm3s");
 		
+		
 		_initialized = true;
 		
-	}
 	return _deviceCount;
 }
 
 void PM3Monitor::start(unsigned short int a_deviceNumber,PM3MonitorHandler& handler)
 {  
-	if (!_initialized)
-		throw PM3Exception(ERROR_INIT_NOT_CALLED,"initialize not called");
+	//reset the numbers
+	_strokeData.forcePlotCount = 0;
+	_strokeData.strokesPerMinuteAverage =0 ;
+	_nSPMReads = 0;
+	_nSPM = 0 ;
+	
+	handleError( 
+				tkcmdsetDDI_discover_pm3s((char *)TKCMDSET_PM3_PRODUCT_NAME2, 0, &_deviceCount),
+				"tkcmdsetDDI_discover_pm3s");
 	
 	_handler = &handler;
 	_deviceNumber = a_deviceNumber; 
@@ -145,8 +146,19 @@ void PM3Monitor::start(unsigned short int a_deviceNumber,PM3MonitorHandler& hand
 	reset();	
 }
 
+void PM3Monitor::setHandler(PM3MonitorHandler& handler)
+{
+	_handler = &handler;
+}
+
+void PM3Monitor::setDeviceNumber(unsigned short int value)
+{
+	_deviceNumber = value;
+}
+
 void PM3Monitor::reset()
 {
+
 	initCommandBuffer();
 	
 	// Reset
@@ -154,19 +166,32 @@ void PM3Monitor::reset()
 	addCSafeData(CSAFE_GOFINISHED_CMD);
 	addCSafeData(CSAFE_GOIDLE_CMD);
 	
+	
+	executeCSafeCommand("go idle tkcmdsetCSAFE_command" );
+
+	initCommandBuffer();
 	// Start.
  	addCSafeData(CSAFE_GOHAVEID_CMD);
 	addCSafeData(CSAFE_GOINUSE_CMD);
 	
+	executeCSafeCommand("go in use tkcmdsetCSAFE_command" );
+
 	try 
 	{
-		executeCSafeCommand("reset tkcmdsetCSAFE_command" );
 	}
+		
 	catch (...) 
 	{
+		throw;
 		//some how this somtimes goes wrong, ignore because it still works fine
 		//todo find out why and fix it
 	}
+	
+	initCommandBuffer();
+	addCSafeData(CSAFE_RESET_CMD);
+	executeCSafeCommand("reset tkcmdsetCSAFE_command" );
+
+	
 	
 }
 
@@ -231,13 +256,14 @@ void PM3Monitor::highResolutionUpdate()
 	if (_currentStrokePhase != _previousStrokePhase)
 	{
 		// If this is the dwell, complete the power curve.
-		if (_currentStrokePhase < _previousStrokePhase)
+		//if (_previousStrokePhase == StrokePhase_Drive)
+		if (_currentStrokePhase == StrokePhase_Recovery)
 		{   
 		    lowResolutionUpdate();						
 		}
 		
 		// Update the stroke phase.
-		newStrokePhase();
+		newStrokePhase(_currentStrokePhase);
 	}
 }
 
@@ -273,36 +299,39 @@ void PM3Monitor::accumulateForceCurve()
 		executeCSafeCommand("accumulateForceCurve tkcmdsetCSAFE_command");
 		
 		nPointsReturned = _rsp_data[4];
-		
+		short unsigned int orgCount = _strokeData.forcePlotCount;
 		for (unsigned short int i = 0; i < nPointsReturned; i += 2)
 		{  
 			_strokeData.forcePlotPoints[_strokeData.forcePlotCount] = _rsp_data[5 + i] + (_rsp_data[6 + i] << 8);
-			incrementalPowerCurveUpdate();
 			(_strokeData.forcePlotCount)++;
-			if (_strokeData.forcePlotCount>MAX_PLOT_POINTS)
+			if (_strokeData.forcePlotCount>=MAX_PLOT_POINTS)
 				throw PM3Exception(ERROR_POINT_BUFFER_OVERFLOW,"Plot point buffer overflow");
 			
 		}
+		if (nPointsReturned>0)
+			incrementalPowerCurveUpdate(_strokeData.forcePlotPoints,
+										orgCount,
+										_strokeData.forcePlotCount);
 		
 		
 	}
 }	
-void PM3Monitor::incrementalPowerCurveUpdate()
+void PM3Monitor::incrementalPowerCurveUpdate(unsigned short int forcePlotPoints[],unsigned short int a_beginIndex,unsigned short int a_endIndex)
 {   
-	if (_handler!=NULL)
-		_handler->onIncrementalPowerCurveUpdate(*this, _strokeData.forcePlotPoints[_strokeData.forcePlotCount], _strokeData.forcePlotCount);
+	if (_handler!=NULL)  
+		_handler->onIncrementalPowerCurveUpdate(*this, forcePlotPoints,a_beginIndex,a_endIndex);
 }
 
-void PM3Monitor::newStrokePhase()
+void PM3Monitor::newStrokePhase(StrokePhase strokePhase)
 {	
 	if (_handler!=NULL)
-		_handler->onNewStrokePhase(*this,_currentStrokePhase);
+		_handler->onNewStrokePhase(*this,strokePhase);
 }
 
-void PM3Monitor::strokeDataUpdate()
+void PM3Monitor::strokeDataUpdate(StrokeData &strokeData)
 {	
 	if (_handler!=NULL)
-		_handler->onStrokeDataUpdate(*this,_strokeData);
+		_handler->onStrokeDataUpdate(*this,strokeData);
 }
 
 
@@ -318,7 +347,7 @@ void PM3Monitor::lowResolutionUpdate()
 			(_strokeData.forcePlotPoints[i] > prefStrokeData )//it is rising again
 			)
 		{	
-			_strokeData.forcePlotCount=i+1; //use the previous one which was less
+			_strokeData.forcePlotCount=i+2; //use the previous one which was less
 			break; //found the real end of the stroke
 		}
 		prefStrokeData=_strokeData.forcePlotPoints[i];
@@ -436,27 +465,39 @@ void PM3Monitor::lowResolutionUpdate()
 		
 		uint currentSPM = _rsp_data[currentbyte];
 		
-		if (0 < currentSPM)
+		if ( currentSPM > 0)
 		{
 			_nSPM += currentSPM;
 			_nSPMReads++;
 			
 			_strokeData.strokesPerMinute = currentSPM;
-			_strokeData.strokesPerMinuteAverage = (_nSPM * 1.0) / (_nSPMReads * 1.0);
+			_strokeData.strokesPerMinuteAverage = (double)_nSPM / (double)_nSPMReads;
 		}
 		
 		currentbyte += datalength;
 	}
-	strokeDataUpdate();
+	strokeDataUpdate(_strokeData);
 	
 	//Copy the part which was left out as begining 
 	int i2 = 0;
+	if (_strokeData.forcePlotCount>=1)
+		_strokeData.forcePlotCount-=1;
 	for( int i= _strokeData.forcePlotCount;i<oldforcePlotCount;i++) 
 	{	
 		_strokeData.forcePlotPoints[i2] =_strokeData.forcePlotPoints[i];
 		i2++;
 	}
 	_strokeData.forcePlotCount = i2;
+
 	
-	
+}
+
+PM3MonitorHandler* PM3Monitor::handler()
+{
+	return _handler;
+}
+
+void PM3Monitor::setDeviceCount(UINT16_T value)
+{
+	_deviceCount = value;
 }

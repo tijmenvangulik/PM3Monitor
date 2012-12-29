@@ -63,7 +63,7 @@ class PM3Exception:public exception
 };
 
 const int CM_DATA_BUFFER_SIZE = 64;
-const int MAX_PLOT_POINTS = 1024; //todo find the real limit maybe a bit largen then needed
+const int MAX_PLOT_POINTS = 512; //todo find the real limit maybe a bit largen then needed
 
 const int ERROR_INIT_DEVICE_NOT_FOUND = 1;
 const int ERROR_POINT_BUFFER_OVERFLOW = 2;
@@ -93,19 +93,16 @@ class PM3MonitorHandler
 { 
 public:
 	// attach to this event for live drawing of the curve. (onStrokeDataUpdate gives only the curve at the end of the stroke 
-	virtual void onIncrementalPowerCurveUpdate(PM3Monitor &monitor,unsigned short int a_value,unsigned short int a_index)
-	{};
+	virtual void onIncrementalPowerCurveUpdate(PM3Monitor& monitor,unsigned short int forcePlotPoints[],unsigned short int a_beginIndex,unsigned short int a_endIndex) {};
 	//called on catch,drive,dwell and recovery ( the catch is not  allways send )
-	virtual void onNewStrokePhase(PM3Monitor &monitor,StrokePhase strokePhase)
-	{};
+	virtual void onNewStrokePhase(PM3Monitor& monitor,StrokePhase strokePhase) {} ;
 	//strokeData contains info about the stroke. Send at the same time as the dwell
-	virtual void onStrokeDataUpdate(PM3Monitor &monitor,StrokeData &strokeData)
-	{};
+	virtual void onStrokeDataUpdate(PM3Monitor &monitor,StrokeData &strokeData) {};
 };
 
 class PM3Monitor
 { 
-protected:
+private:
 	
     bool _initialized;
     UINT16_T _deviceCount;
@@ -133,11 +130,13 @@ protected:
 	void accumulateForceCurve();
 	void lowResolutionUpdate();
 	
-	//events
-	virtual void newStrokePhase();
-	virtual void incrementalPowerCurveUpdate();
-	virtual void strokeDataUpdate();
 	
+protected:
+	//events
+	virtual void newStrokePhase(StrokePhase strokePhase);
+	virtual void incrementalPowerCurveUpdate(unsigned short int forcePlotPoints[],unsigned short int a_beginIndex,unsigned short int a_endIndex);
+	virtual void strokeDataUpdate(StrokeData &strokeData);
+	void setDeviceCount(UINT16_T value);
 public:
 	//this mst be called after the create
 	unsigned short int initialize();
@@ -157,10 +156,15 @@ public:
 	//return current device number a_deviceNumber 
 	unsigned short int deviceNumber();
 	
-	PM3Monitor();
+	void setDeviceNumber(unsigned short int value);
+	
+	PM3Monitor() : _initialized(false),_deviceCount(0),_deviceNumber(0),
+	   _previousStrokePhase(StrokePhase_Idle),_currentStrokePhase(StrokePhase_Idle),
+	_nSPMReads(0), _nSPM(0),_handler(NULL) {}
 	
 	
-	
+	void setHandler(PM3MonitorHandler& handler);
+	PM3MonitorHandler* handler();
 };
 
 #endif //PM3MONITOR_HEADER
