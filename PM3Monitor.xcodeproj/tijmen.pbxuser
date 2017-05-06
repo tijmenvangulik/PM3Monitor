@@ -1,0 +1,231 @@
+// !$*UTF8*$!
+{
+	08FB7793FE84155DC02AAC07 /* Project object */ = {
+		activeBuildConfigurationName = Debug;
+		activeExecutable = 6AFC73001667F83B00601CA7 /* PM3Monitor */;
+		activeTarget = 8DD76F620486A84900D96B5E /* PM3Monitor */;
+		addToTargets = (
+			8DD76F620486A84900D96B5E /* PM3Monitor */,
+		);
+		breakpoints = (
+			6A4D864616738C5B0018158E /* PM3Monitor.h:115 */,
+		);
+		codeSenseManager = 6AFC730A1667F83E00601CA7 /* Code sense */;
+		executables = (
+			6AFC73001667F83B00601CA7 /* PM3Monitor */,
+		);
+		perUserDictionary = {
+			PBXConfiguration.PBXFileTableDataSource3.PBXFileTableDataSource = {
+				PBXFileTableDataSourceColumnSortingDirectionKey = "-1";
+				PBXFileTableDataSourceColumnSortingKey = PBXFileDataSource_Filename_ColumnID;
+				PBXFileTableDataSourceColumnWidthsKey = (
+					20,
+					537,
+					20,
+					48,
+					43,
+					43,
+					20,
+				);
+				PBXFileTableDataSourceColumnsKey = (
+					PBXFileDataSource_FiletypeID,
+					PBXFileDataSource_Filename_ColumnID,
+					PBXFileDataSource_Built_ColumnID,
+					PBXFileDataSource_ObjectSize_ColumnID,
+					PBXFileDataSource_Errors_ColumnID,
+					PBXFileDataSource_Warnings_ColumnID,
+					PBXFileDataSource_Target_ColumnID,
+				);
+			};
+			PBXConfiguration.PBXTargetDataSource.PBXTargetDataSource = {
+				PBXFileTableDataSourceColumnSortingDirectionKey = "-1";
+				PBXFileTableDataSourceColumnSortingKey = PBXFileDataSource_Filename_ColumnID;
+				PBXFileTableDataSourceColumnWidthsKey = (
+					20,
+					519,
+					60,
+					20,
+					48,
+					43,
+					43,
+				);
+				PBXFileTableDataSourceColumnsKey = (
+					PBXFileDataSource_FiletypeID,
+					PBXFileDataSource_Filename_ColumnID,
+					PBXTargetDataSource_PrimaryAttribute,
+					PBXFileDataSource_Built_ColumnID,
+					PBXFileDataSource_ObjectSize_ColumnID,
+					PBXFileDataSource_Errors_ColumnID,
+					PBXFileDataSource_Warnings_ColumnID,
+				);
+			};
+			PBXPerProjectTemplateStateSaveDate = 390662889;
+			PBXWorkspaceStateSaveDate = 390662889;
+		};
+		perUserProjectItems = {
+			6A8B1C161749118400A89835 /* PBXTextBookmark */ = 6A8B1C161749118400A89835 /* PBXTextBookmark */;
+			6A8B1C171749118400A89835 /* PBXTextBookmark */ = 6A8B1C171749118400A89835 /* PBXTextBookmark */;
+			6A8B1C181749118400A89835 /* PBXTextBookmark */ = 6A8B1C181749118400A89835 /* PBXTextBookmark */;
+			6A8B1C191749118400A89835 /* PBXTextBookmark */ = 6A8B1C191749118400A89835 /* PBXTextBookmark */;
+			6AB057071674BC86006D91C2 /* PBXTextBookmark */ = 6AB057071674BC86006D91C2 /* PBXTextBookmark */;
+		};
+		sourceControlManager = 6AFC73091667F83E00601CA7 /* Source Control */;
+		userBuildSettings = {
+		};
+	};
+	08FB7796FE84155DC02AAC07 /* main.cpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {887, 1495}}";
+			sepNavSelRange = "{3067, 0}";
+			sepNavVisRange = "{0, 916}";
+			sepNavWindowFrame = "{{390, 120}, {849, 734}}";
+		};
+	};
+	6A4D864616738C5B0018158E /* PM3Monitor.h:115 */ = {
+		isa = PBXFileBreakpoint;
+		actions = (
+		);
+		breakpointStyle = 0;
+		continueAfterActions = 0;
+		countType = 0;
+		delayBeforeContinue = 0;
+		fileReference = 6AFC730D1667F87C00601CA7 /* PM3Monitor.h */;
+		hitCount = 0;
+		ignoreCount = 0;
+		lineNumber = 115;
+		modificationTime = 376673269.078522;
+		originalNumberOfMultipleMatches = 1;
+		state = 0;
+	};
+	6A8B1C161749118400A89835 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 6AFC730D1667F87C00601CA7 /* PM3Monitor.h */;
+		name = "PM3Monitor.h: 2";
+		rLen = 0;
+		rLoc = 12;
+		rType = 0;
+		vrLen = 654;
+		vrLoc = 3;
+	};
+	6A8B1C171749118400A89835 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 6AFC730E1667F87C00601CA7 /* PM3Monitor.cpp */;
+		name = "PM3Monitor.cpp: 314";
+		rLen = 0;
+		rLoc = 6325;
+		rType = 0;
+		vrLen = 827;
+		vrLoc = 6078;
+	};
+	6A8B1C181749118400A89835 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 08FB7796FE84155DC02AAC07 /* main.cpp */;
+		name = "main.cpp: 96";
+		rLen = 233;
+		rLoc = 3190;
+		rType = 0;
+		vrLen = 785;
+		vrLoc = 2773;
+	};
+	6A8B1C191749118400A89835 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 08FB7796FE84155DC02AAC07 /* main.cpp */;
+		name = "main.cpp: 94";
+		rLen = 0;
+		rLoc = 3067;
+		rType = 0;
+		vrLen = 916;
+		vrLoc = 0;
+	};
+	6AB057071674BC86006D91C2 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = C6859E8B029090EE04C91782 /* PM3Monitor.1 */;
+		name = "PM3Monitor.1: 1";
+		rLen = 0;
+		rLoc = 0;
+		rType = 0;
+		vrLen = 1286;
+		vrLoc = 0;
+	};
+	6AFC73001667F83B00601CA7 /* PM3Monitor */ = {
+		isa = PBXExecutable;
+		activeArgIndices = (
+		);
+		argumentStrings = (
+		);
+		autoAttachOnCrash = 1;
+		breakpointsEnabled = 1;
+		configStateDict = {
+		};
+		customDataFormattersEnabled = 1;
+		dataTipCustomDataFormattersEnabled = 1;
+		dataTipShowTypeColumn = 1;
+		dataTipSortType = 0;
+		debuggerPlugin = GDBDebugging;
+		disassemblyDisplayState = 0;
+		dylibVariantSuffix = "";
+		enableDebugStr = 1;
+		environmentEntries = (
+		);
+		executableSystemSymbolLevel = 0;
+		executableUserSymbolLevel = 0;
+		libgmallocEnabled = 0;
+		name = PM3Monitor;
+		savedGlobals = {
+		};
+		showTypeColumn = 0;
+		sourceDirectories = (
+		);
+	};
+	6AFC73091667F83E00601CA7 /* Source Control */ = {
+		isa = PBXSourceControlManager;
+		fallbackIsa = XCSourceControlManager;
+		isSCMEnabled = 0;
+		scmConfiguration = {
+			repositoryNamesForRoots = {
+				"" = "";
+			};
+		};
+	};
+	6AFC730A1667F83E00601CA7 /* Code sense */ = {
+		isa = PBXCodeSenseManager;
+		indexTemplatePath = "";
+	};
+	6AFC730D1667F87C00601CA7 /* PM3Monitor.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1202, 2431}}";
+			sepNavSelRange = "{3277, 0}";
+			sepNavVisRange = "{3160, 1083}";
+			sepNavWindowFrame = "{{318, 121}, {849, 734}}";
+		};
+	};
+	6AFC730E1667F87C00601CA7 /* PM3Monitor.cpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1020, 7124}}";
+			sepNavSelRange = "{12060, 0}";
+			sepNavVisRange = "{11706, 623}";
+			sepNavWindowFrame = "{{527, 125}, {849, 734}}";
+		};
+	};
+	6AFC73101667F87C00601CA7 /* utility.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {790, 583}}";
+			sepNavSelRange = "{233, 0}";
+			sepNavVisRange = "{0, 234}";
+			sepNavWindowFrame = "{{15, 139}, {849, 734}}";
+		};
+	};
+	8DD76F620486A84900D96B5E /* PM3Monitor */ = {
+		activeExec = 0;
+		executables = (
+			6AFC73001667F83B00601CA7 /* PM3Monitor */,
+		);
+	};
+	C6859E8B029090EE04C91782 /* PM3Monitor.1 */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {737, 949}}";
+			sepNavSelRange = "{0, 0}";
+			sepNavVisRange = "{0, 1286}";
+		};
+	};
+}

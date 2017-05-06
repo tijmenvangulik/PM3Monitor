@@ -12,4 +12,6 @@
 
 int keyboardHit();
 
+void decodeDuration( double duration, int &miliseconds,int &seconds,int &minutes,int &hours,int &days );
+
 #endif

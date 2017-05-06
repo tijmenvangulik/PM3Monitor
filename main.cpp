@@ -59,12 +59,17 @@ public:
 		}
 		cout << "Drag factor: " << strokeData.dragFactor << "\n";
 		cout << "Work distance: " <<  strokeData.workDistance << "\n";
-		cout << "Work time " <<  strokeData.workTimehours << ":" 
-		<< strokeData.workTimeminutes<< ":" 
-		<< strokeData.workTimeseconds << "\n"; 
+        //convert a float work time to a time
+        int miliseconds;int seconds;int minutes;int hours;int days;
+        decodeDuration( strokeData.workTime, miliseconds, seconds, minutes, hours, days );
+        
+		cout << "Work time "
+             <<  hours << ":"
+             << minutes<< ":"
+             << seconds << "\n";
 		cout << "Work time: " <<  strokeData.workTime << "\n";
 		cout << "Split: " <<  strokeData.splitMinutes << ":" 
-		<< strokeData.splitSeconds << "\n";
+             << strokeData.splitSeconds << "\n";
 		cout << "Power: " <<  strokeData.power << "\n";
 		cout << "Strokes Per Minute Average: " <<  strokeData.strokesPerMinuteAverage << "\n";
 		cout << "Strokes Per Minute: " <<  strokeData.strokesPerMinute << "\n";

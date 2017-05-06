@@ -24,6 +24,9 @@
 
 #include "utility.h"
 #include <iostream>
+#include "math.h"
+#include <unistd.h>
+
 
 //none blocking key board hit utility function
 //code copied from ##c@irc.freenode.net
@@ -37,4 +40,15 @@ int keyboardHit()
     FD_SET(STDIN_FILENO, &fds); //STDIN_FILENO is 0
     select(STDIN_FILENO+1, &fds, NULL, NULL, &tv);
     return FD_ISSET(STDIN_FILENO, &fds);
+}
+//convert duration in seconds to the time parts
+void decodeDuration( double duration, int &miliseconds,int &seconds,int &minutes,int &hours,int &days ) {
+    miliseconds = round(duration*1000);
+    int durationInt = duration;
+    seconds = durationInt % 60;
+    durationInt = durationInt / 60;
+    minutes = durationInt % 60;
+    durationInt = durationInt / 60;
+    hours = durationInt % 24;
+    days = durationInt/24;
 }

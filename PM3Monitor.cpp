@@ -32,7 +32,7 @@ PM3Exception::PM3Exception(int a_errorCode,const string a_errorText)
 	
 	ostringstream convert; 
 	
-	convert << "PM3 error "<< a_errorCode;
+	convert << "PM error "<< a_errorCode;
 	
 	if (a_errorCode<0)
 	{	  
@@ -71,14 +71,15 @@ PM3Exception::~PM3Exception() throw()
 
 void handleError(int errorCode, const string errorText)
 { 
-	if (errorCode!=0)
+	if (errorCode!=0 &&
+        errorCode!=-10201 ) //ignore ergometer not found
 	{ 
 		throw PM3Exception(errorCode, errorText );
 	}
 }
 
 unsigned short int PM3Monitor::deviceNumber()
-{ 
+{
 	return _deviceNumber;
 }
 
@@ -112,14 +113,30 @@ unsigned short int PM3Monitor::initialize()
 		handleError(
 					tkcmdsetCSAFE_init_protocol(1000),
 					"tkcmdsetCSAFE_init_protocol");
-		handleError( 
-					tkcmdsetDDI_discover_pm3s((char *)TKCMDSET_PM3_PRODUCT_NAME2, 0, &_deviceCount),
-					"tkcmdsetDDI_discover_pm3s");
+
+        updateDeviceCount();
 		
-		
-		_initialized = true;
+        _initialized = true;
 		
 	return _deviceCount;
+}
+void PM3Monitor::updateDeviceCount()
+{  //https://github.com/kdahlhaus/easy-erg/blob/c30ec1d308464c17f7dca7623605e776f3d170db/src/ErgNet.cpp
+    UINT16_T deviceCount = 0;
+    
+    //PM3 to PM5 exist , just in case already support PM 6-8
+    for(uint i =3;i<=8;i++) {
+        ostringstream monitorStream;
+        
+        monitorStream << "Concept2 Performance Monitor "<<i<<" (PM"<<i<<")";
+        deviceCount=0;
+        string monitorString = monitorStream.str();
+        handleError(
+                    tkcmdsetDDI_discover_pm3s((char *)monitorString.c_str(), 0, &deviceCount),
+                    "tkcmdsetDDI_discover_pm");
+        _deviceCount+=deviceCount;
+        
+    }
 }
 
 void PM3Monitor::start(unsigned short int a_deviceNumber,PM3MonitorHandler& handler)
@@ -127,12 +144,28 @@ void PM3Monitor::start(unsigned short int a_deviceNumber,PM3MonitorHandler& hand
 	//reset the numbers
 	_strokeData.forcePlotCount = 0;
 	_strokeData.strokesPerMinuteAverage =0 ;
+
+	_strokeData.workDistance = 0;
+	_strokeData.workTime = 0;
+	_strokeData.splitMinutes = 0; 
+	_strokeData.splitSeconds = 0;
+	_strokeData.power = 0;
+	_strokeData.strokesPerMinute = 0;	
+	_strokeData.dragFactor = 0;
+	
 	_nSPMReads = 0;
 	_nSPM = 0 ;
 	
-	handleError( 
-				tkcmdsetDDI_discover_pm3s((char *)TKCMDSET_PM3_PRODUCT_NAME2, 0, &_deviceCount),
-				"tkcmdsetDDI_discover_pm3s");
+	_trainingData.workoutType = 0; 
+	_trainingData.duration = 0; 	
+	_trainingData.distance = 0;
+	_trainingData.workoutState = 0; 
+	_trainingData.workoutIntervalCount = 0;
+	_trainingData.intervalType = 0;
+	_trainingData.endDuration = 0;
+	_trainingData.endDistance = 0;
+
+	updateDeviceCount();
 	
 	_handler = &handler;
 	_deviceNumber = a_deviceNumber; 
@@ -141,9 +174,10 @@ void PM3Monitor::start(unsigned short int a_deviceNumber,PM3MonitorHandler& hand
 	{
 		_initialized = true;
 	}
-	else throw PM3Exception(ERROR_INIT_DEVICE_NOT_FOUND,"Init error, PM3 device not found.");
+	else throw PM3Exception(ERROR_INIT_DEVICE_NOT_FOUND,"Init error, ergometer device not found.");
 	
-	reset();	
+    trainingDataUpdate();
+	
 }
 
 void PM3Monitor::setHandler(PM3MonitorHandler& handler)
@@ -158,11 +192,12 @@ void PM3Monitor::setDeviceNumber(unsigned short int value)
 
 void PM3Monitor::reset()
 {
-
+    
 	initCommandBuffer();
 	
 	// Reset
 	//
+    
 	addCSafeData(CSAFE_GOFINISHED_CMD);
 	addCSafeData(CSAFE_GOIDLE_CMD);
 	
@@ -190,7 +225,8 @@ void PM3Monitor::reset()
 	initCommandBuffer();
 	addCSafeData(CSAFE_RESET_CMD);
 	executeCSafeCommand("reset tkcmdsetCSAFE_command" );
-
+	
+	trainingDataUpdate();
 	
 	
 }
@@ -254,7 +290,8 @@ void PM3Monitor::highResolutionUpdate()
 	accumulateForceCurve();
 	
 	if (_currentStrokePhase != _previousStrokePhase)
-	{
+	{	
+		int duration = calcStrokePhaseDuration();
 		// If this is the dwell, complete the power curve.
 		//if (_previousStrokePhase == StrokePhase_Drive)
 		if (_currentStrokePhase == StrokePhase_Recovery)
@@ -263,13 +300,61 @@ void PM3Monitor::highResolutionUpdate()
 		}
 		
 		// Update the stroke phase.
-		newStrokePhase(_currentStrokePhase);
+		newStrokePhase(_currentStrokePhase,duration);
 	}
 }
 
+
+int PM3Monitor::calcStrokePhaseDuration()
+{
+	//calc the duration for the drive and the recovery
+	
+#ifdef BOOST
+    time_duration duration;// = time_duration(0,0,0,0)
+#else
+    float duration;
+#endif
+
+	if (_currentStrokePhase == StrokePhase_Recovery ||
+		_currentStrokePhase == StrokePhase_Drive) 
+	{
+#ifdef BOOST
+		ptime endPhase =  microsec_clock::universal_time();
+		duration = endPhase - _startPhase;
+#else
+		time_t endPhase =  clock();
+        duration = (((float)endPhase - (float)_startPhase) / 1000000.0F ) * 1000;
+#endif
+
+		_startPhase = endPhase;
+	}
+#ifdef BOOST
+	return duration.total_milliseconds();
+#else
+	return duration;
+#endif
+}
+
+
 void PM3Monitor::update()
-{ 
+{	
 	highResolutionUpdate();
+	
+#ifdef BOOST
+	ptime currenttime = microsec_clock::universal_time();
+	time_duration diff;
+	diff = currenttime- _lastTraingTime; //note _lastTraingTime is initialized in trainingDataUpdate, which is called in the begining
+	int diffMs = diff.total_milliseconds();
+#else
+	time_t currenttime =  clock();
+	int diffMs = (((float)currenttime - (float)_lastTraingTime) / 1000000.0F ) * 1000;
+#endif
+	
+	//when work out is buzy update every second, before update every 200 ms
+	if ( ( _trainingData.workoutState!=wsWorkoutRow && diffMs>200) ||
+	     ( _trainingData.workoutState==wsWorkoutRow && diffMs>1000) )
+		trainingDataUpdate();
+	
 }
 
 
@@ -315,17 +400,24 @@ void PM3Monitor::accumulateForceCurve()
 		
 		
 	}
-}	
+}
+
+void PM3Monitor::trainingDataChanged() {
+	if (_handler!=NULL)  
+		_handler->onTrainingDataChanged(*this, _trainingData);
+	
+}
+
 void PM3Monitor::incrementalPowerCurveUpdate(unsigned short int forcePlotPoints[],unsigned short int a_beginIndex,unsigned short int a_endIndex)
 {   
 	if (_handler!=NULL)  
 		_handler->onIncrementalPowerCurveUpdate(*this, forcePlotPoints,a_beginIndex,a_endIndex);
 }
 
-void PM3Monitor::newStrokePhase(StrokePhase strokePhase)
+void PM3Monitor::newStrokePhase(StrokePhase strokePhase, int phaseDuration)
 {	
 	if (_handler!=NULL)
-		_handler->onNewStrokePhase(*this,strokePhase);
+		_handler->onNewStrokePhase(*this,strokePhase,phaseDuration);
 }
 
 void PM3Monitor::strokeDataUpdate(StrokeData &strokeData)
@@ -334,7 +426,235 @@ void PM3Monitor::strokeDataUpdate(StrokeData &strokeData)
 		_handler->onStrokeDataUpdate(*this,strokeData);
 }
 
+void PM3Monitor::trainingDataUpdate()
+{
+#ifdef BOOST
+	_lastTraingTime = microsec_clock::universal_time();
+#else
+    _lastTraingTime = clock();
+#endif
+    
+	initCommandBuffer();
+	
+	addCSafeData(CSAFE_SETUSERCFG1_CMD);
+	addCSafeData(0x07);
+	
+	addCSafeData(CSAFE_PM_GET_WORKOUTTYPE);
+	addCSafeData(CSAFE_PM_GET_WORKOUTSTATE);
+	addCSafeData(CSAFE_PM_GET_WORKOUTINTERVALCOUNT);
+	addCSafeData(CSAFE_PM_GET_INTERVALTYPE);
+	addCSafeData(CSAFE_PM_GET_RESTTIME);
+	addCSafeData(CSAFE_PM_GET_WORKTIME);
+	addCSafeData(CSAFE_PM_GET_WORKDISTANCE);
+	
+	addCSafeData(CSAFE_GETTWORK_CMD);
+	addCSafeData(CSAFE_GETHORIZONTAL_CMD);
+	
+	executeCSafeCommand("TrainingDataUpdate tkcmdsetCSAFE_command" );
+	
+    uint currentbyte = 0;
+	uint datalength = 0;
+	uint actualDistance = 0;
+	uint actualTime = 0;
+	double duration = 0;
+	double distance = 0;
+	
+	bool changed = false;
+	
+	if (_rsp_data[currentbyte] == CSAFE_SETUSERCFG1_CMD)
+	{
+		currentbyte += 2;
+	}
+			
+	if (_rsp_data[currentbyte] == CSAFE_PM_GET_WORKOUTTYPE)  
+	{
+		currentbyte++;
+		datalength = _rsp_data[currentbyte];
+		currentbyte++;
+		
+		uint workoutType = _rsp_data[currentbyte];
+		if (_trainingData.workoutType!=workoutType) 
+		{
+			_trainingData.workoutType=workoutType;
+			changed = true;
+		}
+		currentbyte += datalength;
+		
+		
+	}
 
+	if (_rsp_data[currentbyte] == CSAFE_PM_GET_WORKOUTSTATE)
+	{
+		currentbyte++;
+		datalength = _rsp_data[currentbyte];
+		currentbyte++; 
+		
+		uint workoutState = _rsp_data[currentbyte];
+		if (_trainingData.workoutState!=workoutState) 
+		{
+			_trainingData.workoutState=workoutState;
+			changed = true;
+		}
+		currentbyte += datalength;
+		
+	}
+	if (_rsp_data[currentbyte] == CSAFE_PM_GET_WORKOUTINTERVALCOUNT)
+	{
+		currentbyte++;
+		datalength = _rsp_data[currentbyte];
+		currentbyte++; 
+		
+		uint workoutIntervalCount = _rsp_data[currentbyte];
+		if (_trainingData.workoutIntervalCount!=workoutIntervalCount) 
+		{
+			_trainingData.workoutIntervalCount=workoutIntervalCount;
+			changed = true;
+		}
+		currentbyte += datalength;
+		
+	}
+	if (_rsp_data[currentbyte] == CSAFE_PM_GET_INTERVALTYPE)
+	{
+		currentbyte++;
+		datalength = _rsp_data[currentbyte];
+		currentbyte++; 
+		
+		uint intervalType = _rsp_data[currentbyte];
+		if (_trainingData.intervalType!=intervalType) 
+		{
+			_trainingData.intervalType=intervalType;
+			changed = true;
+		}
+		currentbyte += datalength;
+		
+	}
+	if (_rsp_data[currentbyte] == CSAFE_PM_GET_RESTTIME)
+	 {
+	 currentbyte++;
+	 datalength = _rsp_data[currentbyte];
+	 currentbyte++; 
+	 
+	 uint restTime = _rsp_data[currentbyte] + (_rsp_data[currentbyte + 1] << 8);
+		 if (_trainingData.restTime!=restTime) 
+		 {
+			 _trainingData.restTime=restTime;
+			 changed = true;
+		 }
+	 currentbyte += datalength;
+	 
+	 }
+	if (_rsp_data[currentbyte] == CSAFE_PM_GET_WORKTIME)  
+	{
+		currentbyte++;
+		datalength = _rsp_data[currentbyte];
+		currentbyte++; 
+		
+		uint timeInSeconds = (_rsp_data[currentbyte] + (_rsp_data[currentbyte + 1] << 8) + 
+							  (_rsp_data[currentbyte + 2] << 16) + (_rsp_data[currentbyte + 3] << 24)) / 100;
+		uint fraction = _rsp_data[currentbyte + 4];
+		
+		duration = timeInSeconds + (fraction / 100.0);
+		
+		currentbyte += datalength;
+		
+		
+	}
+	if (_rsp_data[currentbyte] == CSAFE_PM_GET_WORKDISTANCE)
+	{
+		currentbyte++;
+		datalength = _rsp_data[currentbyte];
+		currentbyte++; 
+		
+		uint meters = (_rsp_data[currentbyte] + (_rsp_data[currentbyte + 1] << 8) +
+					(_rsp_data[currentbyte + 2] << 16) + 
+					(_rsp_data[currentbyte + 3] << 24)) / 10;
+		uint fraction = _rsp_data[currentbyte + 4];
+		distance =  meters + (fraction /10.0);
+		
+		currentbyte += datalength;
+		
+	}
+	if (_rsp_data[currentbyte] == CSAFE_GETTWORK_CMD)
+	{
+		currentbyte++;
+		datalength = _rsp_data[currentbyte];
+		currentbyte++; 
+		
+		actualTime = (_rsp_data[currentbyte]*60*60) + 
+		(_rsp_data[currentbyte + 1] *60)+ 
+		(_rsp_data[currentbyte + 2 ]);
+		
+		currentbyte += datalength;
+		
+	}
+	if (_rsp_data[currentbyte] == CSAFE_GETHORIZONTAL_CMD)
+	{
+		currentbyte++;
+		datalength = _rsp_data[currentbyte];
+		currentbyte++; 
+		
+		actualDistance = _rsp_data[currentbyte] + 
+						(_rsp_data[currentbyte + 1] << 8);
+		
+		currentbyte += datalength;
+		
+	}
+	//total time and distance can be changed because the rower is rowing.
+	//the work time and work distance should be 0 for initial change
+	if ( _currentStrokePhase==StrokePhase_Catch && actualTime==0 && actualDistance==0 ) { 
+		
+		uint durationRound = round(duration);
+		
+		if (_trainingData.duration!=durationRound) 
+		{
+			_trainingData.duration=durationRound;
+			changed = true;
+		}
+		uint distanceRound = round(distance);
+		if (_trainingData.distance!=distanceRound) 
+		{
+			_trainingData.distance=distanceRound;
+			changed = true;
+		}
+	}
+	//if (_trainingData.workoutState==wsWorkoutLogged) {
+    //    _trainingData.endDuration=_trainingData.endDuration;
+    //}
+	if (_trainingData.workoutState==wsWorkoutLogged && 
+		 ( _trainingData.endDuration==0 &&
+	 	   _trainingData.endDistance==0) ) {
+		//otherwise the work time does not reflect the last time and distance
+		if ( _trainingData.workoutType>=FixedDistanceNoSplits &&
+			 _trainingData.workoutType<=FixedTimeSplits ) {
+			
+			if (duration!=0) { //doing an fixed distance
+				_strokeData.workTime = duration;
+				_strokeData.workDistance = 0;
+				_strokeData.time=duration;
+				_strokeData.distance = _trainingData.distance;
+                _trainingData.endDistance=_trainingData.distance;
+                _trainingData.endDuration=duration;
+			}
+			if (distance!=0) { //doing a fixed time
+				_strokeData.workDistance = distance;
+				_strokeData.workTime = 0;
+				_strokeData.time= _trainingData.duration;
+				_strokeData.distance = distance;
+                _trainingData.endDuration=_trainingData.duration;
+			}
+			strokeDataUpdate(_strokeData);//send the updated last end time/ duration to the server
+		}
+		changed= true;
+	}
+    if (_trainingData.workoutState!=wsWorkoutLogged &&
+        ( _trainingData.endDistance!=0 ||  _trainingData.endDuration!=0)) {
+        _trainingData.endDistance=0;
+        _trainingData.endDuration=0;
+        changed=true;
+    }
+	if (changed) trainingDataChanged();
+	
+}
 void PM3Monitor::lowResolutionUpdate()
 {   
 	int oldforcePlotCount = _strokeData.forcePlotCount-1;
@@ -361,7 +681,6 @@ void PM3Monitor::lowResolutionUpdate()
 	addCSafeData( 0x03);
 	
 	// Three PM3 extension commands.
-	
 	addCSafeData(CSAFE_PM_GET_DRAGFACTOR);
 	addCSafeData(CSAFE_PM_GET_WORKDISTANCE);
 	addCSafeData(CSAFE_PM_GET_WORKTIME);
@@ -371,6 +690,9 @@ void PM3Monitor::lowResolutionUpdate()
 	addCSafeData(CSAFE_GETPACE_CMD);
 	addCSafeData(CSAFE_GETPOWER_CMD);
 	addCSafeData(CSAFE_GETCADENCE_CMD);
+	addCSafeData(CSAFE_GETTWORK_CMD);
+	addCSafeData(CSAFE_GETHORIZONTAL_CMD);
+	addCSafeData(CSAFE_GETCALORIES_CMD);
 	
 	executeCSafeCommand("lowResolutionUpdate tkcmdsetCSAFE_command" );
 	
@@ -381,7 +703,7 @@ void PM3Monitor::lowResolutionUpdate()
 	{
 		currentbyte += 2;
 	}
-	
+
 	if (_rsp_data[currentbyte] == CSAFE_PM_GET_DRAGFACTOR)
 	{
 		currentbyte++;
@@ -389,9 +711,9 @@ void PM3Monitor::lowResolutionUpdate()
 		currentbyte++;
 		
 		_strokeData.dragFactor = _rsp_data[currentbyte];
-		
+				
 		currentbyte += datalength;
-	}
+	}	
 	
 	if (_rsp_data[currentbyte] == CSAFE_PM_GET_WORKDISTANCE)
 	{
@@ -399,10 +721,12 @@ void PM3Monitor::lowResolutionUpdate()
 		datalength = _rsp_data[currentbyte];
 		currentbyte++;
 		
-		uint distanceTemp = (_rsp_data[currentbyte] + (_rsp_data[currentbyte + 1] << 8) + (_rsp_data[currentbyte + 2] << 16) + (_rsp_data[currentbyte + 3] << 24)) / 10;
-		//uint fractionTemp = _rsp_data[currentbyte + 4];
+		uint distanceTemp = (_rsp_data[currentbyte] + (_rsp_data[currentbyte + 1] << 8) +
+							 (_rsp_data[currentbyte + 2] << 16) + 
+							 (_rsp_data[currentbyte + 3] << 24)) / 10;
+		uint fractionTemp = _rsp_data[currentbyte + 4];
 		
-		_strokeData.workDistance = distanceTemp;
+		_strokeData.workDistance = distanceTemp + (fractionTemp /10.0);
 		
 		currentbyte += datalength;
 	}
@@ -419,9 +743,6 @@ void PM3Monitor::lowResolutionUpdate()
 			uint fraction = _rsp_data[currentbyte + 4];
 			
 			_strokeData.workTime = timeInSeconds + (fraction / 100.0);
-			_strokeData.workTimehours = timeInSeconds / 3600;
-			_strokeData.workTimeminutes = (timeInSeconds / 60) % 60;
-			_strokeData.workTimeseconds = timeInSeconds % 60;
 		}
 		currentbyte += datalength;
 	}
@@ -435,6 +756,13 @@ void PM3Monitor::lowResolutionUpdate()
 		// Pace is in seconds/Km
 		
 		uint pace = _rsp_data[currentbyte] + (_rsp_data[currentbyte + 1] << 8);
+        if (pace>0) {
+            //get cal/hr: Calories/Hr = (((2.8 / ( pace * pace * pace )) * ( 4.0 * 0.8604)) + 300.0)
+            double paced = pace/1000.0; // formular needs pace in sec/m (not sec/km)
+            _strokeData.caloriesPerHour = round(( (2.8 / (paced*paced*paced) ) * ( 4.0 * 0.8604) ) + 300.0) ;
+            
+        }
+        else _strokeData.caloriesPerHour =0;
 		// get pace in seconds / 500m
 		
 		double fPace = pace / 2.0;
@@ -476,6 +804,43 @@ void PM3Monitor::lowResolutionUpdate()
 		
 		currentbyte += datalength;
 	}
+	
+	if (_rsp_data[currentbyte] == CSAFE_GETTWORK_CMD)
+	{
+		currentbyte++;
+		datalength = _rsp_data[currentbyte];
+		currentbyte++; 
+		
+		_strokeData.time = (_rsp_data[currentbyte]*60*60) + 
+		(_rsp_data[currentbyte + 1] *60)+ 
+		(_rsp_data[currentbyte + 2 ]);
+		
+		currentbyte += datalength;
+		
+	}
+	if (_rsp_data[currentbyte] == CSAFE_GETHORIZONTAL_CMD)
+	{
+		currentbyte++;
+		datalength = _rsp_data[currentbyte];
+		currentbyte++; 
+		
+		_strokeData.distance = _rsp_data[currentbyte] + 
+								(_rsp_data[currentbyte + 1] << 8);
+		
+		currentbyte += datalength;
+		
+	}
+    if (_rsp_data[currentbyte] == CSAFE_GETCALORIES_CMD)
+	{  // Calories in 1 cal resolution, total/accumulated calories burned.
+		currentbyte++;
+		datalength = _rsp_data[currentbyte];
+		currentbyte++;
+		// Byte 0: Total Calories (LSB)  |  Byte 1: Total Calories (MSB)
+		uint cal = _rsp_data[currentbyte] + (_rsp_data[currentbyte + 1] << 8);
+		_strokeData.totCalories = cal;
+		currentbyte += datalength;
+	}
+
 	strokeDataUpdate(_strokeData);
 	
 	//Copy the part which was left out as begining 

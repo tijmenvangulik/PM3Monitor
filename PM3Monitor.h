@@ -6,7 +6,9 @@
  *
  *  xcode c++ project ot make concept2 PM3 monitoring easy
  *  thanks to Andrew Lewis for the great .net example. a large part of
- *  his example could be used for this project.
+ *  28-10-2014 his example could be used for this project.
+ *  Merged some changes of https://github.com/miguelitoelgrande/c2osd
+ *  removed reset to fix issues
  */
 
 /*
@@ -29,13 +31,28 @@
 #define PM3MONITOR_HEADER
 
 #include <exception>
-#include <Carbon/Carbon.h>
+#ifdef WIN32
+typedef unsigned short uint;
+typedef unsigned long UInt32;
+#else
+  #include <Carbon/Carbon.h>
+#endif
 #include <string>
 #include "PM3DDICP.h"
 
 using namespace std;
 
+#ifdef BOOST
+#include <boost/date_time/posix_time/posix_time.hpp>
+using namespace boost::posix_time;
+#else
+#include <time.h>
+#endif
 
+
+#ifndef TKCMDSET_PM5_PRODUCT_NAME
+  #define TKCMDSET_PM5_PRODUCT_NAME "Concept2 Performance Monitor 5 (PM5)"
+#endif
 
 enum StrokePhase
 {
@@ -44,6 +61,42 @@ enum StrokePhase
 	StrokePhase_Drive = 2,
 	StrokePhase_Dwell = 3,
 	StrokePhase_Recovery = 4
+};
+
+enum WorkoutType
+{
+	JustRowNoSplits = 0,
+	JustRowSplits = 1,
+	FixedDistanceNoSplits =2 ,
+	FixtedDistanceSplits = 3,
+	FixedTimeNoSplits = 4,
+	FixedTimeSplits = 5,
+	FixedTimeInterval = 6,
+	FixedDistanceInterval = 7,
+	VariableInterval = 8
+};
+
+enum WorkoutState {
+	wsWaitingToBegin = 0,
+	wsWorkoutRow = 1,
+	wsCountdownPause = 2,
+	wsIntervalRest = 3,
+	wsWorkTimeInterval = 4,
+	wsWorkDistanceInterval = 5,
+	wsRestIntervalEndToWorktimeIntervalBegin = 6,
+	wsRestIntervalEndToWorkDistanceIntervalBegin = 7,
+	wsWorktimeIntervalEndToRestIntervalBegin = 8,
+	wsWorkdistanceIntervalEndToRestIntervalBegin = 9,
+	wsWorkoutEnd = 10,
+	wsWorkoutTerminate = 11,
+	wsWorkoutLogged = 12,
+	wsWorkoutReArm =13
+};
+
+enum IntervalType {
+	itTime = 0,
+	itDistance = 1,
+	itRest = 2
 };
 
 //convert the phase to a display text
@@ -73,17 +126,32 @@ struct StrokeData
 {
 	unsigned short int forcePlotPoints[MAX_PLOT_POINTS];
 	unsigned short int forcePlotCount;
-	uint dragFactor;
-	uint workDistance;
-	uint workTimehours;
-	uint workTimeminutes;
-	uint workTimeseconds; 
+	double workDistance; 
 	double workTime;
 	double splitMinutes; 
 	double splitSeconds;
 	uint power;
 	double strokesPerMinuteAverage;
-	uint strokesPerMinute;		 
+	uint strokesPerMinute;
+    uint distance;
+	uint time;
+	uint dragFactor;
+	uint totCalories; // accumulated calories burned  CSAFE_GETCALORIES_CMD
+	uint caloriesPerHour;  // calories/Hr derived from pace (GETPACE)
+
+};
+
+struct TrainingData 
+{ 
+	uint workoutType; 
+	uint duration;	
+	uint distance;
+	uint workoutState; 
+	uint workoutIntervalCount;
+	uint intervalType;
+	uint restTime;
+	double endDistance;
+	double endDuration;	
 };
 
 class PM3Monitor;
@@ -95,9 +163,11 @@ public:
 	// attach to this event for live drawing of the curve. (onStrokeDataUpdate gives only the curve at the end of the stroke 
 	virtual void onIncrementalPowerCurveUpdate(PM3Monitor& monitor,unsigned short int forcePlotPoints[],unsigned short int a_beginIndex,unsigned short int a_endIndex) {};
 	//called on catch,drive,dwell and recovery ( the catch is not  allways send )
-	virtual void onNewStrokePhase(PM3Monitor& monitor,StrokePhase strokePhase) {} ;
+	virtual void onNewStrokePhase(PM3Monitor& monitor,StrokePhase strokePhase,int phaseDuration) {} ;
 	//strokeData contains info about the stroke. Send at the same time as the dwell
 	virtual void onStrokeDataUpdate(PM3Monitor &monitor,StrokeData &strokeData) {};
+	virtual void onTrainingDataChanged(PM3Monitor &monitor,TrainingData &trainingData) {};
+	
 };
 
 class PM3Monitor
@@ -121,6 +191,15 @@ private:
 	
 	uint _nSPMReads;
 	uint _nSPM;
+#ifdef BOOST
+	ptime _startPhase;
+	ptime _lastTraingTime;
+#else
+	clock_t _startPhase;
+	clock_t _lastTraingTime;
+#endif
+
+	TrainingData _trainingData;
 	
     void initCommandBuffer();
 	void addCSafeData(UInt32 data);
@@ -129,14 +208,19 @@ private:
     virtual void highResolutionUpdate();
 	void accumulateForceCurve();
 	void lowResolutionUpdate();
-	
+	void updateDeviceCount();
 	
 protected:
 	//events
-	virtual void newStrokePhase(StrokePhase strokePhase);
+	virtual void newStrokePhase(StrokePhase strokePhase,int phaseDuration);
 	virtual void incrementalPowerCurveUpdate(unsigned short int forcePlotPoints[],unsigned short int a_beginIndex,unsigned short int a_endIndex);
 	virtual void strokeDataUpdate(StrokeData &strokeData);
+	virtual void trainingDataChanged();
+	
 	void setDeviceCount(UINT16_T value);
+	int calcStrokePhaseDuration();
+	void trainingDataUpdate();
+	
 public:
 	//this mst be called after the create
 	unsigned short int initialize();
@@ -145,7 +229,7 @@ public:
 	void start(unsigned short int a_deviceNumber,PM3MonitorHandler& handler);
 	
 	//resets the PM3, already called in the initialize at the first time
-	void reset();
+	virtual void reset();
 	
 	//updates the performance data, call this about ever 80 mili seconds ( or faster)
 	void update();
@@ -165,6 +249,8 @@ public:
 	
 	void setHandler(PM3MonitorHandler& handler);
 	PM3MonitorHandler* handler();
+    
+    TrainingData& getTrainingData() {return _trainingData;};
 };
 
 #endif //PM3MONITOR_HEADER
