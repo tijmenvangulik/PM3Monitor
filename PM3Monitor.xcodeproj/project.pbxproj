@@ -3,17 +3,17 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 44;
+	objectVersion = 46;
 	objects = {
 
 /* Begin PBXBuildFile section */
+		6AED6D991A0EBB84002DDBF1 /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6AED6D981A0EBB84002DDBF1 /* IOKit.framework */; };
+		6AED6D9B1A0EBB96002DDBF1 /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6AED6D9A1A0EBB96002DDBF1 /* Carbon.framework */; };
 		6AFC73111667F87C00601CA7 /* PM3Monitor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6AFC730E1667F87C00601CA7 /* PM3Monitor.cpp */; };
 		6AFC73121667F87C00601CA7 /* utility.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6AFC730F1667F87C00601CA7 /* utility.cpp */; };
 		6AFC731E166930B300601CA7 /* libPM3DDICP.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6AFC731A166930B300601CA7 /* libPM3DDICP.a */; };
 		6AFC731F166930B300601CA7 /* libPM3CSafeCP.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6AFC731B166930B300601CA7 /* libPM3CSafeCP.a */; };
 		6AFC7320166930B300601CA7 /* libLCPM3USB.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6AFC731C166930B300601CA7 /* libLCPM3USB.a */; };
-		6AFC7322166930C400601CA7 /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6AFC7321166930C400601CA7 /* Carbon.framework */; };
-		6AFC7327166930D600601CA7 /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6AFC7326166930D600601CA7 /* IOKit.framework */; };
 		8DD76F650486A84900D96B5E /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08FB7796FE84155DC02AAC07 /* main.cpp */; settings = {ATTRIBUTES = (); }; };
 		8DD76F6A0486A84900D96B5E /* PM3Monitor.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = C6859E8B029090EE04C91782 /* PM3Monitor.1 */; };
 /* End PBXBuildFile section */
@@ -33,6 +33,8 @@
 
 /* Begin PBXFileReference section */
 		08FB7796FE84155DC02AAC07 /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		6AED6D981A0EBB84002DDBF1 /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = System/Library/Frameworks/IOKit.framework; sourceTree = SDKROOT; };
+		6AED6D9A1A0EBB96002DDBF1 /* Carbon.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Carbon.framework; path = System/Library/Frameworks/Carbon.framework; sourceTree = SDKROOT; };
 		6AFC730D1667F87C00601CA7 /* PM3Monitor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PM3Monitor.h; sourceTree = "<group>"; };
 		6AFC730E1667F87C00601CA7 /* PM3Monitor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PM3Monitor.cpp; sourceTree = "<group>"; };
 		6AFC730F1667F87C00601CA7 /* utility.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = utility.cpp; sourceTree = "<group>"; };
@@ -44,8 +46,6 @@
 		6AFC731B166930B300601CA7 /* libPM3CSafeCP.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libPM3CSafeCP.a; path = concept2/libPM3CSafeCP.a; sourceTree = "<group>"; };
 		6AFC731C166930B300601CA7 /* libLCPM3USB.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLCPM3USB.a; path = concept2/libLCPM3USB.a; sourceTree = "<group>"; };
 		6AFC731D166930B300601CA7 /* csafe.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = csafe.h; path = concept2/csafe.h; sourceTree = "<group>"; };
-		6AFC7321166930C400601CA7 /* Carbon.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Carbon.framework; path = System/Library/Frameworks/Carbon.framework; sourceTree = SDKROOT; };
-		6AFC7326166930D600601CA7 /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = System/Library/Frameworks/IOKit.framework; sourceTree = SDKROOT; };
 		8DD76F6C0486A84900D96B5E /* PM3Monitor */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = PM3Monitor; sourceTree = BUILT_PRODUCTS_DIR; };
 		C6859E8B029090EE04C91782 /* PM3Monitor.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = PM3Monitor.1; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -55,11 +55,11 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6AED6D9B1A0EBB96002DDBF1 /* Carbon.framework in Frameworks */,
+				6AED6D991A0EBB84002DDBF1 /* IOKit.framework in Frameworks */,
 				6AFC731E166930B300601CA7 /* libPM3DDICP.a in Frameworks */,
 				6AFC731F166930B300601CA7 /* libPM3CSafeCP.a in Frameworks */,
 				6AFC7320166930B300601CA7 /* libLCPM3USB.a in Frameworks */,
-				6AFC7322166930C400601CA7 /* Carbon.framework in Frameworks */,
-				6AFC7327166930D600601CA7 /* IOKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -69,6 +69,8 @@
 		08FB7794FE84155DC02AAC07 /* PM3Monitor */ = {
 			isa = PBXGroup;
 			children = (
+				6AED6D9A1A0EBB96002DDBF1 /* Carbon.framework */,
+				6AED6D981A0EBB84002DDBF1 /* IOKit.framework */,
 				6AFC73161669307E00601CA7 /* Frameworks */,
 				6AFC73131667F88300601CA7 /* Concept2 */,
 				08FB7795FE84155DC02AAC07 /* Source */,
@@ -115,8 +117,6 @@
 		6AFC73161669307E00601CA7 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				6AFC7321166930C400601CA7 /* Carbon.framework */,
-				6AFC7326166930D600601CA7 /* IOKit.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -155,9 +155,16 @@
 /* Begin PBXProject section */
 		08FB7793FE84155DC02AAC07 /* Project object */ = {
 			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0730;
+			};
 			buildConfigurationList = 1DEB923508733DC60010E9CD /* Build configuration list for PBXProject "PM3Monitor" */;
-			compatibilityVersion = "Xcode 3.0";
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
 			hasScannedForEncodings = 1;
+			knownRegions = (
+				en,
+			);
 			mainGroup = 08FB7794FE84155DC02AAC07 /* PM3Monitor */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -184,6 +191,7 @@
 		1DEB923208733DC60010E9CD /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
@@ -206,6 +214,7 @@
 		1DEB923308733DC60010E9CD /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				GCC_MODEL_TUNING = G5;
 				INSTALL_PATH = /usr/local/bin;
@@ -220,27 +229,23 @@
 		1DEB923608733DC60010E9CD /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ENABLE_TESTABILITY = YES;
 				GCC_DEBUGGING_SYMBOLS = default;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				ONLY_ACTIVE_ARCH = YES;
 				PREBINDING = NO;
-				SDKROOT = "$(DEVELOPER_SDK_DIR)/MacOSX10.5.sdk";
+				SDKROOT = macosx;
 			};
 			name = Debug;
 		};
 		1DEB923708733DC60010E9CD /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = (
-					ppc,
-					i386,
-				);
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				PREBINDING = NO;
-				SDKROOT = "$(DEVELOPER_SDK_DIR)/MacOSX10.5.sdk";
+				SDKROOT = macosx;
 			};
 			name = Release;
 		};
